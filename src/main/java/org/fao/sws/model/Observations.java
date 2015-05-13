@@ -1,41 +1,60 @@
 package org.fao.sws.model;
 
-import static java.lang.String.*;
+import static lombok.AccessLevel.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.validation.Valid;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
+import lombok.Setter;
 
-import org.fao.sws.model.configuration.Adapters.RefAdapter;
+import org.fao.sws.model.common.Group;
+import org.fao.sws.model.configuration.Validators.NotEmptyGroup;
 
 
-@XmlRootElement @NoArgsConstructor @EqualsAndHashCode @ToString
+@XmlRootElement @NoArgsConstructor 
+
+@Data
+@EqualsAndHashCode(exclude="boundFlags") 
 public class Observations {
 
-	@XmlElement(name="flag") @XmlJavaTypeAdapter(RefAdapter.class)
-	@Getter 
-	private List<Flag> flags = new ArrayList<>();
+	@Valid @NotEmptyGroup
+	@Setter(NONE) 
+	private Group<FlagRef> flags = new Group<>();
 	
-	public Observations with(@NonNull Flag ... flags) {
+	public Observations with(@NonNull FlagRef ... flags) {
 		
-		for (Flag flag : flags ) {
-			
-			if (this.flags.contains(flag.id()))
-				throw new IllegalArgumentException(format("duplicate entity %s",flag.id()));
-		
-			this.flags.add(flag);
-		};
+		this.flags.with(flags);
 		
 		return this;
 	}
 	
+	// legacy format support via JAXB callback.
+	// copies on binding to match both legacy format _and_ grouping facilities
+	// you'd remove it entirely when/if legacy could be phased out.
+	
+	@XmlElementRef
+	private Collection<FlagRef> boundFlags;
+	
+	
+	boolean beforeMarshal(Marshaller _) {
+		boundFlags = this.flags.all();
+		return true;
+	}
+ 
+	void afterMmarshal(Marshaller _) {
+		this.boundFlags = null;
+	}
+	
+	void afterUnmarshal(Unmarshaller _, Object __) {
+		 this.flags = new Group<>(boundFlags);
+	}
 }

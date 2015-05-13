@@ -43,7 +43,8 @@ public class Validator {
 	 */
 	public Configuration valid(Configuration configuration) throws IllegalStateException {
 		
-		return $valid(configuration,Global.class);
+		$valid(configuration,Global.class);
+		return $valid(configuration);
 	}
 	
 	

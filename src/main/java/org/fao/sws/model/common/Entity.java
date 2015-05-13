@@ -1,15 +1,15 @@
 package org.fao.sws.model.common;
 
+import static lombok.AccessLevel.*;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.ToString;
 
 import org.fao.sws.model.Dataset;
 import org.fao.sws.model.Dimension;
@@ -25,16 +25,15 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @XmlSeeAlso({Domain.class, Dimension.class, Flag.class, Dataset.class})
 
-@NoArgsConstructor @EqualsAndHashCode @ToString
-public abstract class Entity {
+@Data @NoArgsConstructor
+public abstract class Entity implements Identified {
 
 	@XmlAttribute(name="code") @XmlID  
 	
 	@NotEmpty(message="{no_entity_id}") 
-	@NonNull @Getter 
+	@NonNull @Setter(NONE) 
 	private String id;
 
-	
 	protected Entity(String id) {
 		
 		this.id = id;
@@ -42,7 +41,6 @@ public abstract class Entity {
 	}
 	
 	@XmlAttribute(name="displayNameKey") 
-	@Setter
 	private String labelKey;
 	
 	public String labelKey() {

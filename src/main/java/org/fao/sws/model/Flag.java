@@ -1,12 +1,14 @@
 package org.fao.sws.model;
 
+import static org.fao.sws.common.Constants.*;
+import static org.fao.sws.common.Utils.*;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import org.fao.sws.model.common.Entity;
@@ -14,15 +16,22 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 
 @XmlRootElement @NoArgsConstructor
-@EqualsAndHashCode(callSuper=true) @ToString
+
+@Data 
+@EqualsAndHashCode(callSuper=true) 
+@ToString(callSuper=true)
 public class Flag extends Entity {
 
 	public Flag(String id) {
 		super(id);
+		this.table=dbfy(refdata_prefix,"flag_"+id());
 	}
 		
 	@XmlAttribute(name="tableName")
 	@NotEmpty(message="{table.required}")
-	@Getter @Setter
 	private String table;
+	
+	public FlagRef ref() {
+		return new FlagRef(this);
+	}
 }

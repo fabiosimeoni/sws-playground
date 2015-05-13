@@ -13,14 +13,16 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
 
 import org.fao.sws.model.common.Entity;
 import org.fao.sws.model.common.Group;
 
+@UtilityClass
 public class Adapters {
 
 	//adapts entities to (only backwards) entity references
-	public static class RefAdapter<T extends Entity> extends XmlAdapter<RefAdapter.RefEntity<T>,T> {
+	public class RefAdapter<T extends Entity> extends XmlAdapter<RefAdapter.RefEntity<T>,T> {
 
 		@AllArgsConstructor @NoArgsConstructor
 		public static class RefEntity<T extends Entity> {
@@ -30,7 +32,7 @@ public class Adapters {
 			T ref;
 			
 		}
-		
+
 		@Override
 		public T unmarshal(RefEntity<T> v) throws Exception {
 			return v.ref;
@@ -39,11 +41,13 @@ public class Adapters {
 		@Override
 		public RefEntity<T> marshal(T v) throws Exception {
 			return new RefEntity<T>(v);
-		}
-		
+		}		
 	}
 	
-	public static class ContactsAdapter extends XmlAdapter<String,Set<String>> {
+	
+	//legacy requirement
+	
+	public class ContactsAdapter extends XmlAdapter<String,Set<String>> {
 
 		@Override
 		public Set<String> unmarshal(String values) throws Exception {
@@ -68,7 +72,7 @@ public class Adapters {
 	
 	
 	
-	 public static class GroupAdapter extends XmlAdapter<GroupAdapter.Entities,Group<Entity>> {
+	 public class GroupAdapter extends XmlAdapter<GroupAdapter.Entities,Group<Entity>> {
 
 		 @AllArgsConstructor @NoArgsConstructor
 		 public static class Entities {

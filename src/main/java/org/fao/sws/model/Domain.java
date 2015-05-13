@@ -18,7 +18,9 @@ import org.fao.sws.model.common.Group;
 
 
 @XmlRootElement 
-@NoArgsConstructor @EqualsAndHashCode(callSuper=true, exclude="bound") @ToString
+@NoArgsConstructor 
+@EqualsAndHashCode(callSuper=true, exclude="bound") 
+@ToString(callSuper=true)
 public class Domain extends Entity {
 	
 	@Valid @Getter 

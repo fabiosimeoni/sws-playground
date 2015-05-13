@@ -32,23 +32,32 @@ public class ConfigurationTest extends ApplicationTest {
 	@Test
 	public void roundtrips_and_is_valid() {
 		
-		Dimension dim = dimension("dim").table("d_table").selectionTable("s_table").hierarchyTable("h_table");
-		Dimension time = timeDimension("time_dim").table("td_table").selectionTable("ts_table").hierarchyTable("th_table");
-		Dimension measure = measureDimension("measure_dim").table("td_table").selectionTable("ts_table").hierarchyTable("th_table");
+		Dimension dim = dimension("a");
+		Dimension time = timeDimension("b");
+		Dimension measure = measureDimension("c");
+		Flag flag = flag("f");
 		
 		dim.labelKey("key"); //defaulting to id will do 99/100 times. just to test here.
+				
+		Dataset ds1 = dataset("ds1").with(
+				
+										dim.ref().roots(110,120,130),
+										time.ref().sdmxCode("somecode"),
+										measure.ref()
+										
+									)
+									.with(observations()
+									
+											.with(flag.ref())
+									);
 		
-		Flag flag = flag("flag").table("f_table");
 		
 		Configuration sws = sws()
 								.contact("john.doe@acme.org")
 								.contact("joe.plumber@acme.org")
 								.with(dim,time,measure)
 								.with(flag)
-								.with(
-										domain("test1").with(dataset("ds1").with(dim).with(observations().with(flag))),
-										domain("test2").with(dataset("ds2").with(dim))
-								);
+								.with(domain("test1").with(ds1));
 		
 		
 		assertEquals(sws, roundtrip(sws));
@@ -57,16 +66,15 @@ public class ConfigurationTest extends ApplicationTest {
 		
 	}
 	
+	
+	
 	@Test
 	public void fragment_is_valid_but_cannot_rountrip() {
 		
 		Configuration sws = sws()
 								.contact("john.doe@acme.org")
 								.contact("joe.plumber@acme.org")
-								.with(
-									domain("d").with(dataset("ds1").with(dimension("dim")).with(observations().with(flag("flag"))))
-								);
-		
+								.with(aDomain());
 		
 		//references cannot be resolved
 		assertNotEquals(sws, roundtrip(sws));
@@ -94,8 +102,8 @@ public class ConfigurationTest extends ApplicationTest {
 		String blank = "";
 		
 		Domain bad = domain().with(dataset(blank));
-		Domain good = domain().with(dataset().with(dimension().table("t").selectionTable("s").hierarchyTable("h")));
-		Configuration sws = sws().with(dimension()).with(bad, good);
+		Domain good = aDomain();
+		Configuration sws = sws().with(bad,aDomain());
 		
 		validator.validFragment(sws);
 		
@@ -124,4 +132,32 @@ public class ConfigurationTest extends ApplicationTest {
 		return binder.bind(in);
 	}
 	
+	
+
+	Domain aDomain() {
+		
+		Dimension dim = dimension("a");
+		Dimension time = timeDimension("b");
+		Dimension measure = measureDimension("c");
+		Flag flag = flag("f");
+		
+		dim.labelKey("key"); //defaulting to id will do 99/100 times. just to test here.
+				
+		Dataset ds1 = dataset("ds1").with(
+				
+										dim.ref().roots(110,120,130),
+										time.ref().sdmxCode("somecode"),
+										measure.ref()
+										
+									)
+									.with(observations()
+									
+											.with(flag.ref())
+									);
+		
+		
+		return domain("d").with(ds1);
+		
+		
+	}
 }

@@ -1,6 +1,7 @@
 package org.fao.sws.model.configuration;
 
 import static java.util.Collections.*;
+import static lombok.AccessLevel.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,9 +14,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.Setter;
 
 import org.fao.sws.model.Dataset;
 import org.fao.sws.model.Dimension;
@@ -29,7 +29,6 @@ import org.fao.sws.model.configuration.Validators.NotEmptyGroup;
 
 public interface Configuration {
 
-	
 	Group<Dimension> dimensions();
 
 	Group<Domain> domains();
@@ -52,29 +51,25 @@ public interface Configuration {
 	
 	
 	@XmlRootElement(name="databaseConfiguration") 
-	@EqualsAndHashCode @ToString
+	@Data @Setter(NONE)
 	class Default implements Configuration {
 	
 		@XmlAttribute(name="mailTo") @XmlJavaTypeAdapter(ContactsAdapter.class)
-		@Getter 
 		Set<String> contacts = new HashSet<>();
 	
 		
 		@XmlElement
 		@Valid @NotEmptyGroup(groups=Global.class,message="{no_shared_dimensions}")
-		@Getter
 		Group<Dimension> dimensions = new Group<>();
 		
 		
 		@XmlElement
 		@Valid @NotEmptyGroup(groups=Global.class,message="{no_shared_flags}")
-		@Getter
 		Group<Flag> flags = new Group<>();
 
 		
 		@XmlElement 
 		@NotEmptyGroup(groups=Global.class,message="{no_shared_domains}") //no @Valid, validation boundary crossed explicitly in code
-		@Getter
 		Group<Domain> domains = new Group<>();
 		
 		
@@ -85,12 +80,12 @@ public interface Configuration {
 		@Override
 		public Group<Dataset> datasets() {
 			
-			List<Dataset> datasets = unmodifiableList(new ArrayList<Dataset>());
+			List<Dataset> datasets = new ArrayList<Dataset>();
 			
 			for (Domain domain : domains.all())
 				datasets.addAll(domain.datasets().all());
 			
-			return new Group<>(datasets);
+			return new Group<>(unmodifiableList(datasets));
 		}
 		
 

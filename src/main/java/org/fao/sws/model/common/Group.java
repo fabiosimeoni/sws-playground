@@ -11,22 +11,20 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import lombok.EqualsAndHashCode;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
 
 import org.fao.sws.model.configuration.Adapters.GroupAdapter;
 
-@XmlJavaTypeAdapter(GroupAdapter.class)
-@NoArgsConstructor @EqualsAndHashCode @ToString
-public class Group<T extends Entity> implements Iterable<T> {
+@XmlJavaTypeAdapter(GroupAdapter.class) @NoArgsConstructor
+@Data 
+public class Group<T extends Identified> implements Iterable<T> {
 
 	@Valid
 	private final Map<String,T> entities = new LinkedHashMap<>();
 	
 	public Group(Collection<T> entities) throws IllegalArgumentException {
-		
 		with(entities);
 	}
 	
@@ -44,6 +42,10 @@ public class Group<T extends Entity> implements Iterable<T> {
 	private Group<T> with(@NonNull Collection<T> entities) {
 		
 		for (T e : entities) {
+			
+			//can happen when deserialising fragment whose IDREFs cannot be resolved
+			if (e.id()==null)
+				continue;
 			
 			if (this.entities.put(e.id(),e)!=null)
 				throw new IllegalArgumentException(format("duplicate entity %s",e.id()));
