@@ -46,6 +46,8 @@ public abstract class DimensionRef implements Identified {
 	@NotEmpty
 	private String joinColumn;
 	
+	private boolean ascending = true;
+	
 	
 	protected DimensionRef(Dimension target) {
 		this.target = target;
@@ -58,6 +60,10 @@ public abstract class DimensionRef implements Identified {
 		return target==null?null:target.id();
 	}
 	
+	
+	public DimensionRef descending() {
+		return ascending(false);
+	}
 	
 	///////////////////////////////////////////////////////////////// roots
 	

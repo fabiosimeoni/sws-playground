@@ -42,7 +42,7 @@ public class ConfigurationTest extends ApplicationTest {
 		Dataset ds1 = dataset("ds1").with(
 				
 										dim.ref().roots(110,120,130),
-										time.ref().sdmxCode("somecode"),
+										time.ref().sdmxCode("somecode").descending(),
 										measure.ref()
 										
 									)

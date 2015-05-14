@@ -89,8 +89,6 @@ public class Dataset extends Entity {
 	@Setter(NONE) 
 	Group<FlagRef> flags = new Group<>();
 	
-	
-	
 	/////////////////////////////////////////////////////////    pro-fluency delegates
 	
 	public Dataset with(@NonNull DimensionRef ... dims) {

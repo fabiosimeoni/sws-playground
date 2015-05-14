@@ -8,7 +8,6 @@ import org.fao.sws.model.Dimension;
 import org.fao.sws.model.Domain;
 import org.fao.sws.model.Flag;
 
-
 @UtilityClass
 public class Dsl {
 

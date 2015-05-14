@@ -6,11 +6,13 @@ import static org.fao.sws.model.configuration.Dsl.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -24,6 +26,7 @@ import org.fao.sws.model.FlagRef;
 import org.fao.sws.model.common.Entity;
 import org.fao.sws.model.common.Group;
 import org.fao.sws.model.configuration.Adapters.DatasetAdapter.Ds.DimRef;
+import org.fao.sws.model.configuration.Adapters.DatasetAdapter.Ds.PivotCol;
 
 @UtilityClass
 public class Adapters {
@@ -55,21 +58,23 @@ public class Adapters {
 				observation.tagObservationTableName=ds.tagObservationTable();
 				observation.flag = ds.flags().all();
 						
-				for (DimensionRef ref : ds.dimensions())
-					observation.dimension.add(new DimRef(ref.target().id(),ref.joinColumn()));
+				for (DimensionRef ref : ds.dimensions()) {
+					observation.dimension.add(new DimRef(ref.id(),ref.joinColumn()));
+					pivoting.add(new PivotCol(ref.id(), ref.ascending()));
+				}
 			}
 			
 			@XmlAttribute
 			String code;
-			
-			@XmlElementRef
-			Collection<DimensionRef> dimensions;
 			
 			@XmlAttribute
 			private boolean defaultEmptyRowsVisible;
 			
 			@XmlAttribute
 			private String sdmxCode;
+			
+			@XmlElementRef
+			Collection<DimensionRef> dimensions;
 			
 			@XmlElement
 			private Obs observation = new Obs();
@@ -93,6 +98,16 @@ public class Adapters {
 				
 				@XmlElement
 				Collection<FlagRef> flag = new ArrayList<>();
+			}
+			
+			@XmlElementWrapper(name="defaultPivoting")
+			@XmlElement(name="dimension")
+			private List<PivotCol> pivoting = new ArrayList<>();
+			
+			@NoArgsConstructor @AllArgsConstructor
+			static class PivotCol {
+				@XmlAttribute String refCode;
+				@XmlAttribute boolean ascending;
 			}
 			
 			@NoArgsConstructor @AllArgsConstructor
@@ -128,6 +143,9 @@ public class Adapters {
 			
 			for (DimRef dim : ds.observation.dimension)
 				dataset.dimensions().get(dim.refCode).joinColumn(dim.joinColumn);
+			
+			for (PivotCol dim : ds.pivoting)
+				dataset.dimensions().get(dim.refCode).ascending(dim.ascending);
 			
 			
 			return dataset;
