@@ -7,7 +7,6 @@ import org.fao.sws.model.Dataset;
 import org.fao.sws.model.Dimension;
 import org.fao.sws.model.Domain;
 import org.fao.sws.model.Flag;
-import org.fao.sws.model.Observations;
 
 
 @UtilityClass
@@ -47,12 +46,6 @@ public class Dsl {
 	
 	public Dimension.Measure measureDimension() {
 		return measureDimension(randomUUID().toString());
-	}
-	
-	
-	
-	public Observations observations() {
-		return new Observations();
 	}
 	
 	public Flag flag(String id) {

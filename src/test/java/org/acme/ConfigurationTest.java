@@ -46,9 +46,8 @@ public class ConfigurationTest extends ApplicationTest {
 										measure.ref()
 										
 									)
-									.with(observations()
-									
-											.with(flag.ref())
+									.with(
+										flag.ref()
 									);
 		
 		
@@ -57,10 +56,18 @@ public class ConfigurationTest extends ApplicationTest {
 								.contact("joe.plumber@acme.org")
 								.with(dim,time,measure)
 								.with(flag)
-								.with(domain("test1").with(ds1));
+								.with(domain("domain").with(ds1));
 		
 		
-		assertEquals(sws, roundtrip(sws));
+		Configuration parsed = roundtrip(sws);
+
+		//decomment to debug problems
+		//System.out.println(sws);
+		//System.out.println(parsed);
+		
+
+		assertEquals(sws, parsed);
+		
 		
 		validator.valid(sws);
 		
@@ -150,10 +157,7 @@ public class ConfigurationTest extends ApplicationTest {
 										measure.ref()
 										
 									)
-									.with(observations()
-									
-											.with(flag.ref())
-									);
+									.with(flag.ref());
 		
 		
 		return domain("d").with(ds1);

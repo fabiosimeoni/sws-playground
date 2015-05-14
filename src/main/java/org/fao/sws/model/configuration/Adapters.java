@@ -1,49 +1,139 @@
 package org.fao.sws.model.configuration;
 
 import static java.util.Arrays.*;
+import static org.fao.sws.model.configuration.Dsl.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlIDREF;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.UtilityClass;
 
+import org.fao.sws.model.Dataset;
+import org.fao.sws.model.DimensionRef;
+import org.fao.sws.model.FlagRef;
 import org.fao.sws.model.common.Entity;
 import org.fao.sws.model.common.Group;
+import org.fao.sws.model.configuration.Adapters.DatasetAdapter.Ds.DimRef;
 
 @UtilityClass
 public class Adapters {
 
-	//adapts entities to (only backwards) entity references
-	public class RefAdapter<T extends Entity> extends XmlAdapter<RefAdapter.RefEntity<T>,T> {
-
-		@AllArgsConstructor @NoArgsConstructor
-		public static class RefEntity<T extends Entity> {
-			
-			@XmlAttribute(name="refCode") 
-			@XmlIDREF 
-			T ref;
-			
-		}
-
-		@Override
-		public T unmarshal(RefEntity<T> v) throws Exception {
-			return v.ref;
-		}
-
-		@Override
-		public RefEntity<T> marshal(T v) throws Exception {
-			return new RefEntity<T>(v);
-		}		
-	}
 	
+	//largest adapter: entirely replaces jaxb-agnotic bean to match legacy format requirements.
+	//legacy format call for nest and redundancies that we want to hide in the data model
+	//a full conversion is required.
+	public class DatasetAdapter extends XmlAdapter<DatasetAdapter.Ds,Dataset> {
+		
+		@XmlRootElement(name="dataSet") @NoArgsConstructor 
+		static class Ds {
+			
+			Ds(Dataset ds) {
+				
+				code=ds.id();
+				dimensions=ds.dimensions().all();
+				defaultEmptyRowsVisible=ds.emptyRowsVisibile();
+				sdmxCode = ds.sdmxCode();
+				observation.valueTableName=ds.table();
+				observation.coordinatesTableName=ds.coordinatesTable();
+				observation.metadataTableName=ds.metadataTable();
+				observation.metadataElementTableName=ds.metadataElementTable();
+				observation.sessionObservationTableName=ds.sessionObservationTable();
+				observation.sessionMetadataTableName=ds.sessionMetadataTable();
+				observation.sessionMetadataElementTableName=ds.sessionMetadataElementTable();
+				observation.validationTableName=ds.validationTable();
+				observation.sessionValidationTableName=ds.sessionValidationTable();
+				observation.tagObservationTableName=ds.tagObservationTable();
+				observation.flag = ds.flags().all();
+						
+				for (DimensionRef ref : ds.dimensions())
+					observation.dimension.add(new DimRef(ref.target().id(),ref.joinColumn()));
+			}
+			
+			@XmlAttribute
+			String code;
+			
+			@XmlElementRef
+			Collection<DimensionRef> dimensions;
+			
+			@XmlAttribute
+			private boolean defaultEmptyRowsVisible;
+			
+			@XmlAttribute
+			private String sdmxCode;
+			
+			@XmlElement
+			private Obs observation = new Obs();
+			
+			static class Obs {
+				
+				@XmlAttribute String valueTableName;
+				@XmlAttribute String coordinatesTableName;
+				@XmlAttribute String sessionObservationTableName;
+				@XmlAttribute String metadataTableName;
+				@XmlAttribute String metadataElementTableName;
+				@XmlAttribute String sessionMetadataTableName;
+				@XmlAttribute String sessionMetadataElementTableName;
+				@XmlAttribute String validationTableName;
+				@XmlAttribute String sessionValidationTableName;
+				@XmlAttribute String tagObservationTableName;
+				
+
+				@XmlElement
+				Collection<DimRef> dimension = new ArrayList<>();
+				
+				@XmlElement
+				Collection<FlagRef> flag = new ArrayList<>();
+			}
+			
+			@NoArgsConstructor @AllArgsConstructor
+			static class DimRef {
+				
+				@XmlAttribute String refCode;
+				@XmlAttribute String joinColumn;
+			}
+		
+		}
+		
+		@Override
+		public Ds marshal(Dataset v) throws Exception {
+			return new Ds(v);
+		}
+		
+		@Override
+		public Dataset unmarshal(Ds ds) throws Exception {
+			
+			Dataset dataset = dataset(ds.code)
+					  .with(ds.observation.flag.toArray(new FlagRef[0]))
+					  .with(ds.dimensions.toArray(new DimensionRef[0]))
+					  .table(ds.observation.valueTableName)
+					  .coordinatesTable(ds.observation.coordinatesTableName)
+					  .sessionObservationTable(ds.observation.sessionObservationTableName)
+					  .metadataTable(ds.observation.metadataTableName)
+					  .metadataElementTable(ds.observation.metadataElementTableName)
+					  .sessionMetadataTable(ds.observation.sessionMetadataTableName)
+					  .sessionMetadataElementTable(ds.observation.sessionMetadataElementTableName)
+					  .validationTable(ds.observation.validationTableName)
+					  .sessionValidationTable(ds.observation.sessionValidationTableName)
+					  .tagObservationTable(ds.observation.tagObservationTableName);
+			
+			for (DimRef dim : ds.observation.dimension)
+				dataset.dimensions().get(dim.refCode).joinColumn(dim.joinColumn);
+			
+			
+			return dataset;
+		}
+		
+	}
 	
 	//legacy requirement
 	

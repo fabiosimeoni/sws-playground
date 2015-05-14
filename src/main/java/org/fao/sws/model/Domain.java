@@ -5,7 +5,7 @@ import java.util.Collection;
 import javax.validation.Valid;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.EqualsAndHashCode;
@@ -44,7 +44,7 @@ public class Domain extends Entity {
 	// copies on binding to match both legacy format _and_ grouping facilities
 	// you'd remove it entirely when/if legacy could be phased out.
 	
-	@XmlElement(name="dataSet") 
+	@XmlElementRef
 	private Collection<Dataset> bound;
 	
 	
@@ -58,7 +58,7 @@ public class Domain extends Entity {
 	}
 	
 	void afterUnmarshal(Unmarshaller _, Object __) {
-		 this.datasets = new Group<>(bound);
+		this.datasets = new Group<>(bound);
 	}
 	
 	

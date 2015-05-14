@@ -61,7 +61,9 @@ public abstract class Dimension extends Entity {
 	////// lgeacy requirement: name specialisations
 
 	@XmlRootElement(name="dimension")
-	@NoArgsConstructor @EqualsAndHashCode(callSuper=true) @ToString
+	@NoArgsConstructor 
+	@EqualsAndHashCode(callSuper=true) 
+	@ToString(callSuper=true)
 	public static class Standard extends Dimension {
 
 		
@@ -78,7 +80,9 @@ public abstract class Dimension extends Entity {
 	}
 	
 	@XmlRootElement(name="timeDimension") 
-	@NoArgsConstructor @EqualsAndHashCode(callSuper=true) @ToString
+	@NoArgsConstructor 
+	@EqualsAndHashCode(callSuper=true) 
+	@ToString(callSuper=true)
 	public static class Time extends Dimension {
 
 		
@@ -93,7 +97,8 @@ public abstract class Dimension extends Entity {
 	}
 	
 	@XmlRootElement(name="measurementUnitDimension") 
-	@NoArgsConstructor @EqualsAndHashCode(callSuper=true) @ToString
+	@NoArgsConstructor @EqualsAndHashCode(callSuper=true)
+	@ToString(callSuper=true)
 	public static class Measure extends Dimension {
 
 		public Measure(String id) {

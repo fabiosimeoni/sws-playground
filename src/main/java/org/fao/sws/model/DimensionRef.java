@@ -1,6 +1,7 @@
 package org.fao.sws.model;
 
 import static lombok.AccessLevel.*;
+import static org.fao.sws.common.Utils.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,11 +43,14 @@ public abstract class DimensionRef implements Identified {
 	@NotEmpty
 	private String sdmxCode;
 	
+	@NotEmpty
+	private String joinColumn;
+	
 	
 	protected DimensionRef(Dimension target) {
 		this.target = target;
-		this.sdmxCode = id();
-		
+		this.sdmxCode = target.id();
+		this.joinColumn= dbfy(target.id());
 	}
 	
 	@Override

@@ -2,62 +2,97 @@ package org.fao.sws.model;
 
 import static java.util.Arrays.*;
 import static lombok.AccessLevel.*;
+import static org.fao.sws.common.Constants.*;
+import static org.fao.sws.common.Utils.*;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.AssertTrue;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
 import org.fao.sws.model.common.Entity;
 import org.fao.sws.model.common.Group;
+import org.fao.sws.model.configuration.Adapters.DatasetAdapter;
 import org.fao.sws.model.configuration.Validators.NotEmptyGroup;
 import org.hibernate.validator.constraints.NotEmpty;
 
-
-@XmlRootElement(name="dataSet") @NoArgsConstructor 
+@XmlJavaTypeAdapter(DatasetAdapter.class)
 
 @Data
-@EqualsAndHashCode(callSuper=true, exclude="boundDims") 
+@EqualsAndHashCode(callSuper=true) 
+@FieldDefaults(level=PRIVATE)
 @ToString(callSuper=true)
 public class Dataset extends Entity {
+	
+	@NotEmpty(message="{table.required}") String table;
+	@NotEmpty(message="{table.required}") String coordinatesTable;
+	@NotEmpty(message="{table.required}") String sessionObservationTable;
+	@NotEmpty(message="{table.required}") String metadataTable;
+	
+	@NotEmpty(message="{table.required}") String metadataElementTable;
+	@NotEmpty(message="{table.required}") String sessionMetadataTable;
+	@NotEmpty(message="{table.required}") String sessionMetadataElementTable;
+	@NotEmpty(message="{table.required}") String validationTable;
+	@NotEmpty(message="{table.required}") String sessionValidationTable;
+	@NotEmpty(message="{table.required}") String tagObservationTable;
 
-	public Dataset(String id) {
-		super(id);
-		sdmxCode = id; //default
+	
+	public Dataset(String id) { //by default, schema is taken from id.
+		this(id,id); 
 	}
 	
+
+	public Dataset(String id, String schema) { 	//allows schema customisations
+		
+		super(id);
+		
+		//defaults
+		
+		sdmxCode = id; 
+		
+		//mapping defaults
+		
+		this.table = dbfy(id,default_observation_table);
+		this.coordinatesTable=dbfy(schema,default_coordinate_table);
+		this.sessionObservationTable=dbfy(schema,default_session_observation_table);
+		this.metadataTable=dbfy(schema,default_metadata_table);
+		this.metadataElementTable=dbfy(schema,default_metadata_element_table);
+		this.sessionMetadataTable=dbfy(schema,default_session_metadata_table);
+		this.sessionMetadataElementTable=dbfy(schema,default_session_metadata_element_table);
+		this.validationTable=dbfy(schema,default_validation_table);
+		this.sessionValidationTable=dbfy(schema,default_session_validation_table);
+		this.tagObservationTable=dbfy(schema,default_tag_observation_table);
+	}
 	
-	@XmlAttribute(name="defaultEmptyRowsVisible")
-	private boolean emptyRowsVisibile = false;
+	boolean emptyRowsVisibile = false;
 	
-	@XmlAttribute
 	@NotEmpty
-	private String sdmxCode;
+	String sdmxCode;
 	
 	
 	///////////////////////////////////////////////////////////////////   dimensions
 	
 	@Valid @NotEmptyGroup
 	@Setter(NONE) 
-	private Group<DimensionRef> dimensions = new Group<>();
+	Group<DimensionRef> dimensions = new Group<>();
+	
+	@Valid @NotEmptyGroup
+	@Setter(NONE) 
+	Group<FlagRef> flags = new Group<>();
 	
 	
-	//pro-fluency delegates: keeps up the builder pattern for inlined constructions
+	
+	/////////////////////////////////////////////////////////    pro-fluency delegates
+	
 	public Dataset with(@NonNull DimensionRef ... dims) {
 		
 		dimensions.with(dims);
@@ -65,61 +100,29 @@ public class Dataset extends Entity {
 		return this;
 	}
 	
-	@AssertTrue(message="{required_dimension_refs}")
-	boolean hasAllDimensionTypes() {
+	public Dataset with(@NonNull FlagRef ... refs) {
 		
-		return typesOf(dimensions).containsAll(asList(Dimension.Standard.class,Dimension.Time.class,Dimension.Measure.class));
-	
-	}
-	
-	
-	// helper
-	private Set<Class<?>> typesOf(Group<DimensionRef> group) {
-		
-		Set<Class<?>> types = new HashSet<>();
-		
-		for (DimensionRef ref : group)
-			types.add(ref.target().getClass());
-		
-		return types;
-		
-	}
-	
-	
-	///////////////////////////////////////////////////////////////////   observations
-	
-	@XmlElement(name="observation")
-	@Valid 
-	@Setter(NONE) 
-	private Observations observations;
-	
-	public Dataset with(@NonNull Observations observations) {
-	
-		this.observations = observations;
+		flags.with(refs);
 		
 		return this;
 	}
 	
 	
-	// legacy format support via JAXB callback.
-	// copies on binding to match both legacy format _and_ grouping facilities
-	// you'd remove it entirely when/if legacy could be phased out.
-	
-	@XmlElementRef
-	private Collection<DimensionRef> boundDims;
 	
 	
-	boolean beforeMarshal(Marshaller _) {
-		boundDims = this.dimensions.all();
-		return true;
+	////////////////////////////////////////////////////////////////////////// validation
+	
+	@AssertTrue(message="{required_dimension_refs}")
+	boolean hasAllDimensionTypes() {
+		
+		Set<Class<?>> types = new HashSet<>();
+
+		for (DimensionRef ref : dimensions)
+			types.add(ref.target().getClass());
+		
+		return types.containsAll(asList(Dimension.Standard.class,
+				                        Dimension.Time.class,
+				                        Dimension.Measure.class));
+	
 	}
- 
-	void afterMmarshal(Marshaller _) {
-		this.boundDims = null;
-	}
-	
-	void afterUnmarshal(Unmarshaller _, Object __) {
-		 this.dimensions = new Group<>(boundDims);
-	}
-	
 }
