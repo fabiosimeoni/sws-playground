@@ -31,7 +31,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 @EqualsAndHashCode(callSuper=true) 
 @FieldDefaults(level=PRIVATE)
 @ToString(callSuper=true)
-public class Dataset extends Entity {
+public class Dataset extends Entity<Dataset> {
+	
+
+	boolean emptyRowsVisibile = false;
+	
+	@NotEmpty
+	String sdmxCode;
 	
 	@NotEmpty(message="{table.required}") String table;
 	@NotEmpty(message="{table.required}") String coordinatesTable;
@@ -73,10 +79,6 @@ public class Dataset extends Entity {
 		this.tagObservationTable=dbfy(schema,default_tag_observation_table);
 	}
 	
-	boolean emptyRowsVisibile = false;
-	
-	@NotEmpty
-	String sdmxCode;
 	
 	
 	///////////////////////////////////////////////////////////////////   dimensions
@@ -106,6 +108,9 @@ public class Dataset extends Entity {
 	}
 	
 	
+	public Dataset showEmptyRows() {
+		return emptyRowsVisibile(true);
+	}
 	
 	
 	////////////////////////////////////////////////////////////////////////// validation

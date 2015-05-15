@@ -20,7 +20,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Data 
 @EqualsAndHashCode(callSuper=true) 
 @ToString(callSuper=true)
-public class Flag extends Entity {
+public class Flag extends Entity<Flag> {
 
 	public Flag(String id) {
 		super(id);

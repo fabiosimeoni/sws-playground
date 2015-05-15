@@ -170,7 +170,8 @@ public class Adapters {
 			for (String value : values)
 				builder.append(value).append(";");
 			
-			builder.deleteCharAt(builder.lastIndexOf(";"));
+			if (builder.length()>0)
+				builder.deleteCharAt(builder.lastIndexOf(";"));
 			
 			return builder.toString();
 		}
@@ -180,23 +181,23 @@ public class Adapters {
 	
 	
 	
-	 public class GroupAdapter extends XmlAdapter<GroupAdapter.Entities,Group<Entity>> {
+	 public class GroupAdapter extends XmlAdapter<GroupAdapter.Entities,Group<Entity<?>>> {
 
 		 @AllArgsConstructor @NoArgsConstructor
 		 public static class Entities {
 			 
 			 @XmlElementRef
-			 Collection<Entity> entities;
+			 Collection<Entity<?>> entities;
 			 
 		 }
 		 
 		@Override
-		public Entities marshal(Group<Entity> group) throws Exception {
+		public Entities marshal(Group<Entity<?>> group) throws Exception {
 			return new Entities(group.all());
 		}
 
 		@Override
-		public Group<Entity> unmarshal(Entities list) throws Exception {
+		public Group<Entity<?>> unmarshal(Entities list) throws Exception {
 			return new Group<>(list.entities);
 		}
 		

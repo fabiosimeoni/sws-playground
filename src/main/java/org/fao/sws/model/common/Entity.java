@@ -26,7 +26,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @XmlSeeAlso({Domain.class, Dimension.class, Flag.class, Dataset.class})
 
 @Data @NoArgsConstructor
-public abstract class Entity implements Identified {
+public abstract class Entity<T extends Entity<T>> implements Identified {
 
 	@XmlAttribute(name="code") @XmlID  
 	
@@ -45,5 +45,11 @@ public abstract class Entity implements Identified {
 	
 	public String labelKey() {
 		return labelKey == null ? id :labelKey;
+	}
+	
+	@SuppressWarnings("all")
+	public T labelKey(String labelkey) {
+		this.labelKey=labelkey;
+		return (T) this;
 	}
 }

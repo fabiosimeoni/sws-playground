@@ -31,7 +31,7 @@ public class Binder {
 	}
 	
 	@SneakyThrows
-	public OutputStream bind(Configuration config, OutputStream stream) {
+	public void bind(Configuration config, OutputStream stream) {
 		
 		Marshaller m = ctx.createMarshaller();
 		
@@ -39,7 +39,6 @@ public class Binder {
 		
 		m.marshal(config,stream);
 		
-		return stream;
 	}
 	
 }

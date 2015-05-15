@@ -10,8 +10,11 @@ public class Producers {
 	@Produces @Alternative
 	Configuration configuration(Locator locator, Binder binder, Validator validator){
 		
-		return validator.valid(binder.bind(locator.locate()));
+		Configuration configuration = binder.bind(locator.locate());
+		
+		validator.valid(configuration);
 	
+		return configuration;
 	}
 	
 }

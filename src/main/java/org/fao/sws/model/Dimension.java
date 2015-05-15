@@ -22,7 +22,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Data 
 @EqualsAndHashCode(callSuper=true)
 @ToString(callSuper=true)
-public abstract class Dimension extends Entity {
+public abstract class Dimension extends Entity<Dimension> {
 
 	public Dimension(String id) {
 		

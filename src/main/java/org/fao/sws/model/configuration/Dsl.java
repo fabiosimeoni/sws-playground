@@ -58,4 +58,8 @@ public class Dsl {
 	public Dataset dataset(String id) {
 		return new Dataset(id);
 	}
+	
+	public Dataset dataset(String id,String schema) {
+		return new Dataset(id,schema);
+	}
 }

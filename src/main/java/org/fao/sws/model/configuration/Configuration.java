@@ -4,17 +4,22 @@ import static java.util.Collections.*;
 import static lombok.AccessLevel.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import org.fao.sws.model.Dataset;
@@ -25,6 +30,7 @@ import org.fao.sws.model.common.Group;
 import org.fao.sws.model.configuration.Adapters.ContactsAdapter;
 import org.fao.sws.model.configuration.Validators.Global;
 import org.fao.sws.model.configuration.Validators.NotEmptyGroup;
+import org.hibernate.validator.constraints.NotEmpty;
 
 
 public interface Configuration {
@@ -51,10 +57,13 @@ public interface Configuration {
 	
 	
 	@XmlRootElement(name="databaseConfiguration") 
-	@Data @Setter(NONE)
+	@Data 
+	@EqualsAndHashCode(exclude="bound")
+	@Setter(NONE)
 	class Default implements Configuration {
 	
-		@XmlAttribute(name="mailTo") @XmlJavaTypeAdapter(ContactsAdapter.class)
+		@XmlAttribute(name="mailTo")  @XmlJavaTypeAdapter(ContactsAdapter.class)
+		@NotEmpty(message="{no_contacts}")
 		Set<String> contacts = new HashSet<>();
 	
 		
@@ -68,7 +77,6 @@ public interface Configuration {
 		Group<Flag> flags = new Group<>();
 
 		
-		@XmlElement 
 		@NotEmptyGroup(groups=Global.class,message="{no_shared_domains}") //no @Valid, validation boundary crossed explicitly in code
 		Group<Domain> domains = new Group<>();
 		
@@ -114,7 +122,32 @@ public interface Configuration {
 			flags().with(flags);
 			return this;
 		}
+
 		
+
+		
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		// legacy format support via JAXB callback.
+		// copies on binding to match both legacy format _and_ grouping facilities
+		// you'd remove it entirely when/if legacy could be phased out.
+		
+		@XmlElementRef
+		private Collection<Domain> bound;
+		
+		
+		boolean beforeMarshal(Marshaller _) {
+			bound = this.domains.all();
+			return true;
+		}
+	 
+		void afterMmarshal(Marshaller _) {
+			this.domains = null;
+		}
+		
+		void afterUnmarshal(Unmarshaller _, Object __) {
+			this.domains = new Group<>(bound);
+		}
 	}
 
 }

@@ -21,7 +21,7 @@ import org.fao.sws.model.common.Group;
 @NoArgsConstructor 
 @EqualsAndHashCode(callSuper=true, exclude="bound") 
 @ToString(callSuper=true)
-public class Domain extends Entity {
+public class Domain extends Entity<Domain> {
 	
 	@Valid @Getter 
 	private Group<Dataset> datasets = new Group<>();

@@ -7,9 +7,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
-import javax.validation.ConstraintValidator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,20 +14,17 @@ import org.fao.sws.model.Domain;
 import org.fao.sws.model.configuration.Validators.Global;
 import org.jboss.weld.exceptions.IllegalStateException;
 
-@ApplicationScoped @Slf4j
+@ApplicationScoped 
+@Slf4j
 public class Validator {
 
-
-	@Inject
-	Instance<ConstraintValidator<?,?>> validators;
-	
 	private javax.validation.Validator inner = buildDefaultValidatorFactory().getValidator();
     
 	
 	/**
 	 * Validates without global constraints.
 	 */
-	public Configuration validFragment(Configuration configuration) throws IllegalStateException {
+	public boolean validFragment(Configuration configuration) throws IllegalStateException {
 		
 		//disables all 
 		
@@ -41,7 +35,7 @@ public class Validator {
 	/**
 	 * Validates with global constraints.
 	 */
-	public Configuration valid(Configuration configuration) throws IllegalStateException {
+	public boolean valid(Configuration configuration) throws IllegalStateException {
 		
 		$valid(configuration,Global.class);
 		return $valid(configuration);
@@ -55,8 +49,10 @@ public class Validator {
 	
 	//two-phase validation logic. it's two-phase: top-level (fatal) and per-domain (fatal) 
 	//in both-phases, constraint groups
-	private Configuration $valid(Configuration configuration, Class<?> ... groups) {
+	private boolean $valid(Configuration configuration, Class<?> ... groups) {
 		
+		
+		boolean there_are_errors = false;
 		
 		///////////////////////////////////////////      top-level validation: outside domain, fatal.
 		
@@ -83,12 +79,13 @@ public class Validator {
 				
 				domains.remove();
 				
+				there_are_errors=true;
+				
 			}
 		}
 		
 		/////////
-		
-		//pro-fluency convenience
-		return configuration;
+
+		return !there_are_errors;
 	}
 }
