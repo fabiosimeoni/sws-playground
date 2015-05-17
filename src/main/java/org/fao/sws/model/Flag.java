@@ -18,7 +18,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @XmlRootElement @NoArgsConstructor
 
 @Data 
-@EqualsAndHashCode(callSuper=true) 
+@EqualsAndHashCode(callSuper=true,exclude="length") 
 @ToString(callSuper=true)
 public class Flag extends Entity<Flag> {
 
@@ -30,6 +30,8 @@ public class Flag extends Entity<Flag> {
 	@XmlAttribute(name="tableName")
 	@NotEmpty(message="{table.required}")
 	private String table;
+	
+	private int length=3;
 	
 	public FlagRef ref() {
 		return new FlagRef(this);
