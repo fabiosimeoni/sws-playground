@@ -60,7 +60,7 @@ public interface Configuration {
 	@Data 
 	@EqualsAndHashCode(exclude="bound")
 	@Setter(NONE)
-	class Default implements Configuration {
+	static class Default implements Configuration {
 	
 		@XmlAttribute(name="mailTo")  @XmlJavaTypeAdapter(ContactsAdapter.class)
 		@NotEmpty(message="{no_contacts}")
@@ -136,16 +136,16 @@ public interface Configuration {
 		private Collection<Domain> bound;
 		
 		
-		boolean beforeMarshal(Marshaller _) {
+		boolean beforeMarshal(Marshaller ignore) {
 			bound = this.domains.all();
 			return true;
 		}
 	 
-		void afterMmarshal(Marshaller _) {
+		void afterMmarshal(Marshaller ignore) {
 			this.domains = null;
 		}
 		
-		void afterUnmarshal(Unmarshaller _, Object __) {
+		void afterUnmarshal(Unmarshaller ignore, Object also_ignore) {
 			this.domains = new Group<>(bound);
 		}
 	}

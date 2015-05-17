@@ -18,7 +18,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.experimental.UtilityClass;
 
 import org.fao.sws.model.Dataset;
 import org.fao.sws.model.DimensionRef;
@@ -28,14 +27,13 @@ import org.fao.sws.model.common.Group;
 import org.fao.sws.model.configuration.Adapters.DatasetAdapter.Ds.DimRef;
 import org.fao.sws.model.configuration.Adapters.DatasetAdapter.Ds.PivotCol;
 
-@UtilityClass
 public class Adapters {
 
 	
 	//largest adapter: entirely replaces jaxb-agnotic bean to match legacy format requirements.
 	//legacy format call for nest and redundancies that we want to hide in the data model
 	//a full conversion is required.
-	public class DatasetAdapter extends XmlAdapter<DatasetAdapter.Ds,Dataset> {
+	public static class DatasetAdapter extends XmlAdapter<DatasetAdapter.Ds,Dataset> {
 		
 		@XmlRootElement(name="dataSet") @NoArgsConstructor 
 		static class Ds {
@@ -155,7 +153,7 @@ public class Adapters {
 	
 	//legacy requirement
 	
-	public class ContactsAdapter extends XmlAdapter<String,Set<String>> {
+	public static class ContactsAdapter extends XmlAdapter<String,Set<String>> {
 
 		@Override
 		public Set<String> unmarshal(String values) throws Exception {
@@ -181,10 +179,10 @@ public class Adapters {
 	
 	
 	
-	 public class GroupAdapter extends XmlAdapter<GroupAdapter.Entities,Group<Entity<?>>> {
+	 public static class GroupAdapter extends XmlAdapter<GroupAdapter.Entities,Group<Entity<?>>> {
 
 		 @AllArgsConstructor @NoArgsConstructor
-		 public static class Entities {
+		 static class Entities {
 			 
 			 @XmlElementRef
 			 Collection<Entity<?>> entities;

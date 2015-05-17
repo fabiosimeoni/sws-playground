@@ -53,13 +53,13 @@ public abstract class Entity<T extends Entity<T>> implements Identified {
 		return labelKey == null ? id :labelKey;
 	}
 
-	@SuppressWarnings("all")
+	@SuppressWarnings("unchecked")
 	public T label(String label) {
 		this.label = label;
 		return (T) this;
 	}
 	
-	@SuppressWarnings("all")
+	@SuppressWarnings("unchecked")
 	public T labelKey(String labelkey) {
 		this.labelKey=labelkey;
 		return (T) this;

@@ -48,16 +48,16 @@ public class Domain extends Entity<Domain> {
 	private Collection<Dataset> bound;
 	
 	
-	boolean beforeMarshal(Marshaller _) {
+	boolean beforeMarshal(Marshaller ignore) {
 		bound = this.datasets.all();
 		return true;
 	}
  
-	void afterMmarshal(Marshaller _) {
+	void afterMmarshal(Marshaller ignore) {
 		this.datasets = null;
 	}
 	
-	void afterUnmarshal(Unmarshaller _, Object __) {
+	void afterUnmarshal(Unmarshaller ignore, Object also_ignore) {
 		this.datasets = new Group<>(bound);
 	}
 	
