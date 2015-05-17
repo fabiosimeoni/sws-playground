@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
@@ -25,7 +26,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @XmlSeeAlso({Domain.class, Dimension.class, Flag.class, Dataset.class})
 
-@Data @NoArgsConstructor
+@Data 
+@NoArgsConstructor 
+@EqualsAndHashCode(exclude="label")
 public abstract class Entity<T extends Entity<T>> implements Identified {
 
 	@XmlAttribute(name="code") @XmlID  
@@ -33,11 +36,14 @@ public abstract class Entity<T extends Entity<T>> implements Identified {
 	@NotEmpty(message="{no_entity_id}") 
 	@NonNull @Setter(NONE) 
 	private String id;
+	
+	private String label;
 
 	protected Entity(String id) {
 		
 		this.id = id;
 		this.labelKey = id;	
+		this.label=id;
 	}
 	
 	@XmlAttribute(name="displayNameKey") 
@@ -45,6 +51,12 @@ public abstract class Entity<T extends Entity<T>> implements Identified {
 	
 	public String labelKey() {
 		return labelKey == null ? id :labelKey;
+	}
+
+	@SuppressWarnings("all")
+	public T label(String label) {
+		this.label = label;
+		return (T) this;
 	}
 	
 	@SuppressWarnings("all")

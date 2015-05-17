@@ -10,6 +10,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import javax.inject.Inject;
+
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 
@@ -29,11 +31,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class ConfigurationTest {
+public class ConfigurationTest extends ApplicationTest {
 
-	Binder binder = new Binder();
+	@Inject
+	Binder binder;
 	
-	Validator validator = new Validator();
+	@Inject
+	Validator validator;
 	
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
@@ -216,7 +220,7 @@ public class ConfigurationTest {
 		
 		Domain bad = domain().with(dataset(blank));
 		Domain good = aDomain();
-		Configuration sws = sws().with(bad,aDomain());
+		Configuration sws = sws().contact("john.doe@acme.org").with(bad,aDomain());
 		
 		validator.validFragment(sws);
 		

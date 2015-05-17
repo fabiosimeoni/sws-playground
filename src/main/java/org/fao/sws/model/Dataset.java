@@ -39,6 +39,9 @@ public class Dataset extends Entity<Dataset> {
 	@NotEmpty
 	String sdmxCode;
 	
+	@Setter(NONE)
+	String schema;
+	
 	@NotEmpty(message="{table.required}") String table;
 	@NotEmpty(message="{table.required}") String coordinatesTable;
 	@NotEmpty(message="{table.required}") String sessionObservationTable;
@@ -60,6 +63,8 @@ public class Dataset extends Entity<Dataset> {
 	public Dataset(String id, String schema) { 	//allows schema customisations
 		
 		super(id);
+		
+		this.schema=schema;
 		
 		//defaults
 		
