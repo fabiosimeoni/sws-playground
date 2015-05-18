@@ -1,5 +1,6 @@
 package org.fao.sws.model;
 
+import static lombok.AccessLevel.*;
 import static org.fao.sws.common.Constants.*;
 import static org.fao.sws.common.Utils.*;
 
@@ -10,6 +11,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import org.fao.sws.model.DimensionRef.StandardRef;
@@ -20,7 +22,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 @XmlSeeAlso({Dimension.Standard.class,Dimension.Time.class,Dimension.Measure.class}) @NoArgsConstructor 
 
 @Data 
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper=true,exclude="length")
 @ToString(callSuper=true)
 public abstract class Dimension extends Entity<Dimension> {
 
@@ -30,7 +32,7 @@ public abstract class Dimension extends Entity<Dimension> {
 		this.sdmxCode = id; //default
 		this.table=dbfy(refdata_prefix,"dim_"+id());
 		this.selectionTable=dbfy(opdata_prefix,"selection_dim_"+id());
-		this.hierarchyTable=dbfy(refdata_prefix,"dim_"+id()+"_hiearchy");
+		this.hierarchyTable=dbfy(refdata_prefix,"dim_"+id()+"_hierarchy");
 	}
 	
 	public abstract DimensionRef ref();
@@ -39,8 +41,10 @@ public abstract class Dimension extends Entity<Dimension> {
 	@NotEmpty(message="{table.required}")
 	private String table;
 	
+	private int length=10;
+	
 	@XmlAttribute(name="selectionTableName")
-	@NotEmpty(message="{table.required}")
+	@Setter(NONE) //reinforce current approach: all tables share same selection table
 	private String selectionTable;
 	
 	@XmlAttribute(name="hierarchyTableName")
@@ -49,11 +53,11 @@ public abstract class Dimension extends Entity<Dimension> {
 	
 	@XmlAttribute
 	@NotEmpty(message="{parent.required}")
-	private String parent = "PARENT";
+	private String parent = dbfy("parent");
 	
 	@XmlAttribute
 	@NotEmpty(message="{child.required}")
-	private String child = "CHILD";
+	private String child = dbfy("child");
 	
 	@XmlAttribute
 	private String sdmxCode;
