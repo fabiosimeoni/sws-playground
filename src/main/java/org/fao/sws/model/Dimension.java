@@ -1,6 +1,5 @@
 package org.fao.sws.model;
 
-import static lombok.AccessLevel.*;
 import static org.fao.sws.common.Constants.*;
 import static org.fao.sws.common.Utils.*;
 
@@ -11,7 +10,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import org.fao.sws.model.DimensionRef.StandardRef;
@@ -44,7 +42,6 @@ public abstract class Dimension extends Entity<Dimension> {
 	private int length=10;
 	
 	@XmlAttribute(name="selectionTableName")
-	@Setter(NONE) //reinforce current approach: all tables share same selection table
 	private String selectionTable;
 	
 	@XmlAttribute(name="hierarchyTableName")
