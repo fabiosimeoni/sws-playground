@@ -92,7 +92,8 @@ public class Dataset extends Entity<Dataset> {
 	@Setter(NONE) 
 	Group<DimensionRef> dimensions = new Group<>();
 	
-	@Valid @NotEmptyGroup
+	@Valid 
+	//@NotEmptyGroup
 	@Setter(NONE) 
 	Group<FlagRef> flags = new Group<>();
 	
