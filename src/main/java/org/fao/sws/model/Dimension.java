@@ -48,11 +48,11 @@ public abstract class Dimension extends Entity<Dimension> {
 	@NotEmpty(message="{table.required}")
 	private String hierarchyTable;
 	
-	@XmlAttribute
+	@XmlAttribute(name="parentColumn")
 	@NotEmpty(message="{parent.required}")
 	private String parent = dbfy("parent");
 	
-	@XmlAttribute
+	@XmlAttribute(name="childColumn")
 	@NotEmpty(message="{child.required}")
 	private String child = dbfy("child");
 	

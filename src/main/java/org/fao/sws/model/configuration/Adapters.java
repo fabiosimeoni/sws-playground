@@ -41,6 +41,7 @@ public class Adapters {
 			Ds(Dataset ds) {
 				
 				code=ds.id();
+				displayNameKey=ds.labelKey();
 				dimensions=ds.dimensions().all();
 				defaultEmptyRowsVisible=ds.emptyRowsVisibile();
 				sdmxCode = ds.sdmxCode();
@@ -64,6 +65,9 @@ public class Adapters {
 			
 			@XmlAttribute
 			String code;
+
+			@XmlAttribute
+			String displayNameKey;
 			
 			@XmlAttribute
 			private boolean defaultEmptyRowsVisible;
@@ -126,6 +130,7 @@ public class Adapters {
 		public Dataset unmarshal(Ds ds) throws Exception {
 			
 			Dataset dataset = dataset(ds.code)
+					  .labelKey(ds.displayNameKey)
 					  .with(ds.observation.flag.toArray(new FlagRef[0]))
 					  .with(ds.dimensions.toArray(new DimensionRef[0]))
 					  .table(ds.observation.valueTableName)
