@@ -2,11 +2,15 @@ package org.fao.sws.model.common;
 
 import static java.lang.String.*;
 import static java.util.Arrays.*;
+import static java.util.Spliterators.*;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javax.validation.Valid;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -31,6 +35,11 @@ public class Group<T extends Identified> implements Iterable<T> {
 	@Override
 	public Iterator<T> iterator() {
 		return entities.values().iterator();
+	}
+	
+	public Stream<T> stream() {
+		return StreamSupport.stream(spliteratorUnknownSize(iterator(), Spliterator.ORDERED),false);
+
 	}
 	
 	@SuppressWarnings("unchecked")
